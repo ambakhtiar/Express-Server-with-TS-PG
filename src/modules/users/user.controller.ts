@@ -75,31 +75,6 @@ const updateUser = async (req: Request, res: Response) => {
     const { name, password, phone, role } = req.body;
 
     try {
-        // requester info should be attached by auth middleware (req.user)
-        const requester = (req as any).user;
-        if (!requester) {
-            return res.status(401).json({ success: false, message: "Unauthorized" });
-        }
-
-        // accept either :userId or :id
-        const targetId = req.params.userId ?? req.params.id;
-        if (!targetId) {
-            return res.status(400).json({ success: false, message: "Missing user id in params" });
-        }
-
-        // Authorization: admin can update anyone; non-admin can update only their own profile
-        if (requester.role !== "admin" && requester.id !== targetId) {
-            return res.status(403).json({ success: false, message: "Forbidden: cannot update other users" });
-        }
-
-        // Prevent non-admin users from changing role
-        const roleToUse = requester.role === "admin" ? role : undefined;
-
-        // Validate password if provided
-        if (password && typeof password === "string" && password.length < 6) {
-            return res.status(400).json({ success: false, message: "Password must be at least 6 characters long" });
-        }
-
         const result = await userServices.updateUser(name, password, phone, role, req.params.id!);
 
         if (result.rows.length === 0) {
