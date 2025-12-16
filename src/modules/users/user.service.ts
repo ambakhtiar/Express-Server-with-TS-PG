@@ -25,11 +25,16 @@ const getSingleuser = async (id: string) => {
     return result;
 };
 
-const updateUser = async (name: string, password: string, phone: string, role: string, id: string) => {
-    const hashedPass = await bcrypt.hash(password as string, 10);
+const updateUser = async (payload: { name?: string; password?: string; phone?: string; role?: string; id: string }) => {
+    const { name, password, phone, role, id } = payload;
+    let hashedPass: string | null = null;
+    if (password) {
+        hashedPass = await bcrypt.hash(password as string, 10);
+    }
+
     const result = await pool.query(
-        `UPDATE users SET name=$1, password=$2, phone=$3, role=$4 WHERE id=$5 RETURNING *`,
-        [name, hashedPass, phone, role, id]
+        `UPDATE users SET name=COALESCE($1, name), password=COALESCE($2, password), phone=COALESCE($3, phone), role=COALESCE($4, role) WHERE id=$5 RETURNING *`,
+        [name ?? null, hashedPass, phone ?? null, role ?? null, id]
     );
 
     return result;

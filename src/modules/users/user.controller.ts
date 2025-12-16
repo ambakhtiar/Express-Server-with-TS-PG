@@ -71,11 +71,29 @@ const getSingleUser = async (req: Request, res: Response) => {
 };
 
 const updateUser = async (req: Request, res: Response) => {
-    // console.log(req.params.id);
     const { name, password, phone, role } = req.body;
 
     try {
-        const result = await userServices.updateUser(name, password, phone, role, req.params.id!);
+        const authUser = req.user as any;
+        if (!authUser) {
+            return res.status(401).json({ success: false, message: "Unauthenticated" });
+        }
+
+        // Allow if admin or owner
+        if (authUser.role !== 'admin' && String(authUser.id) !== String(req.params.id)) {
+            return res.status(403).json({ success: false, message: "You do not have permission to update this user" });
+        }
+
+        // Prevent non-admins from changing role
+        if (authUser.role !== 'admin' && role && role !== authUser.role) {
+            return res.status(403).json({ success: false, message: "You cannot change your role" });
+        }
+
+        if (password && password.length < 6) {
+            return res.status(400).json({ success: false, message: "Password must be at least 6 characters long" });
+        }
+
+        const result = await userServices.updateUser({ name, password, phone, role, id: req.params.id! });
 
         if (result.rows.length === 0) {
             res.status(404).json({

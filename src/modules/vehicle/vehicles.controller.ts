@@ -6,7 +6,7 @@ const createVehicle = async (req: Request, res: Response) => {
         const result = await vehiclesServices.createVehicle(req.body);
         // console.log(result.rows[0]);
         res.status(201).json({
-            success: false,
+            success: true,
             message: "Data Instered Successfully",
             data: result.rows[0],
         });
