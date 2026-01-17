@@ -5,19 +5,19 @@ import config from "../config";
 const auth = (...roles: string[]) => {
     return async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const token = req.headers.authorization;
-            if (!token) {
+            const authHeader = req.headers.authorization;
+            if (!authHeader) {
                 return res.status(401).json({
                     success: false,
                     message: "You are not allowed to access this resource",
                 });
             }
 
-            const decoded = jwt.verify(
-                token,
-                config.jwtSecret as string
-            ) as JwtPayload;
-            console.log({ decoded });
+            const token = authHeader.startsWith("Bearer ")
+                ? authHeader.slice(7)
+                : authHeader;
+
+            const decoded = jwt.verify(token, config.jwtSecret as string) as JwtPayload;
             req.user = decoded;
 
             if (roles.length && !roles.includes(decoded.role)) {
@@ -28,14 +28,16 @@ const auth = (...roles: string[]) => {
             }
 
             next();
-
         } catch (err: any) {
-            res.status(500).json({
-                success: false,
-                message: err.message,
-            });
+            if (err.name === "TokenExpiredError") {
+                return res.status(401).json({ success: false, message: "jwt expired" });
+            }
+            if (err.name === "JsonWebTokenError") {
+                return res.status(401).json({ success: false, message: "Invalid token" });
+            }
+            return res.status(500).json({ success: false, message: "Internal server error" });
         }
     };
-}
+};
 
 export default auth;

@@ -14,16 +14,15 @@ app.use(express.urlencoded({ extended: true }));
 // initializing DB
 initDB();
 
-// "/" -> localhost:5000/
 app.get("/", (req: Request, res: Response) => {
     res.send("Server Running...!");
 });
 
 //CRUD
+app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/vehicles", vehicleRoutes);
 app.use("/api/v1/bookings", bookingRoutes);
-app.use("/api/v1/auth", authRoutes);
 
 
 

@@ -63,10 +63,8 @@ const getSingleVehicle = async (req: Request, res: Response) => {
 };
 
 const updateVehicle = async (req: Request, res: Response) => {
-    // console.log(req.params.id);
-    const { vehicle_name, type, registration_number, daily_rent_price, availability_status } = req.body;
     try {
-        const result = await vehiclesServices.updateVehicle(vehicle_name, type, registration_number, daily_rent_price, availability_status, req.params.id!);
+        const result = await vehiclesServices.updateVehicle(req.body, req.params.id!);
 
         if (result.rows.length === 0) {
             res.status(404).json({

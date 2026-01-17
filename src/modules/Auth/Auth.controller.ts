@@ -34,13 +34,8 @@ const signInUser = async (req: Request, res: Response) => {
         email = email.toLowerCase();
         const result = await authServices.signInUser(email, password);
         // console.log(result.rows[0]);
-        res.status(200).json({
-            success: true,
-            message: "login successful",
-            data: result,
-        });
+        res.status(200).json(result);
     } catch (err: any) {
-        console.log(err);
         res.status(500).json({
             success: false,
             message: err.message,

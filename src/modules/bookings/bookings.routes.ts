@@ -5,9 +5,10 @@ import auth from "../../middleware/auth";
 const router = express.Router();
 
 router.post("/", auth("admin", "customer"), bookingControllers.createBooking);
-router.get("/", auth("admin"), bookingControllers.getBooking);
-router.get("/:id", auth("admin", "customer"), bookingControllers.getSingleBooking);
-router.put("/:id", auth("admin", "customer"), bookingControllers.updateBooking);
+router.get("/", auth("admin", "customer"), bookingControllers.getBooking);
+router.put("/:bookingId", auth("admin", "customer"), bookingControllers.cencelBooking);
+
+
 router.delete("/:id", auth("admin"), bookingControllers.deleteBooking);
 
 export const bookingRoutes = router;

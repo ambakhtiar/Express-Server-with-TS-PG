@@ -6,9 +6,9 @@ const router = express.Router();
 
 
 router.get("/", auth("admin"), userControllers.getUser);
-// router.get("/:id", auth("admin", "customer"), userControllers.getSingleUser);
+router.get("/:id", auth("admin"), userControllers.getSingleUser);
 router.put("/:id", auth("admin", "customer"), userControllers.updateUser);
 router.delete("/:id", auth("admin"), userControllers.deleteUser);
 
 
-export const userRoutes = router;
+export const userRoutes = router; 
